@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using dnlib.DotNet.Writer;
+using System.Security.Cryptography;
+using System.Runtime.InteropServices;
 
 namespace VaporObfuscator
 {
@@ -21,9 +24,8 @@ namespace VaporObfuscator
         bool nameprotection = false;
         bool fakeobfu = false;
         bool junkattribute = false;
-        bool antitamper = false;
         bool encryptstring = false;
-        bool antidebug = false;
+        bool antide4dot = false;
         public Form1()
         {
             InitializeComponent();
@@ -44,7 +46,7 @@ namespace VaporObfuscator
             foreach (TypeDef type in mod.Types)
             {
                 mod.Name = "ObfuscatedByVapor";
-                if (type.IsRuntimeSpecialName || type.IsGlobalModuleType) return;
+                if (type.IsGlobalModuleType) return;
                 type.Name = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
                 type.Namespace = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
                 foreach (PropertyDef property in type.Properties)
@@ -113,6 +115,23 @@ namespace VaporObfuscator
             }
         }
 
+        public void antiDe4Dot(AssemblyDef assembly)
+        {
+            Random rnd = new Random();
+            foreach(ModuleDef module in assembly.Modules)
+            {
+                InterfaceImpl Interface = new InterfaceImplUser(module.GlobalType);
+                for (int i = 200; i < 300; i++)
+                {
+                    TypeDef typedef = new TypeDefUser("", $"Form{i.ToString()}", module.CorLibTypes.GetTypeRef("System", "Attribute"));
+                    InterfaceImpl interface1 = new InterfaceImplUser(typedef);
+                    module.Types.Add(typedef);
+                    typedef.Interfaces.Add(interface1);
+                    typedef.Interfaces.Add(Interface);
+                }
+            }
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             OpenFileDialog openfiledialog = new OpenFileDialog();
@@ -150,6 +169,11 @@ namespace VaporObfuscator
                     encryptString(module);
                     module.Write(textBox3.Text + ".exe");
                 }
+                if(antide4dot == true)
+                {
+                antiDe4Dot(assembly);
+                assembly.Write(textBox3.Text + ".exe");
+                }
                 MessageBox.Show("🍓  🎀  𝕌𝕎𝕌 𝕋𝕙𝕒𝕟𝕜𝕤 𝕗𝕠𝕣 𝕦𝕤𝕚𝕟𝕘 𝕍𝕒𝕡𝕠𝕣𝕆𝕓𝕗𝕦𝕤𝕔𝕒𝕥𝕠𝕣 𝕌𝕎𝕌  🎀  🍓", "🍓  🎀  𝕌𝕎𝕌 𝕋𝕙𝕒𝕟𝕜𝕤 𝕗𝕠𝕣 𝕦𝕤𝕚𝕟𝕘 𝕍𝕒𝕡𝕠𝕣𝕆𝕓𝕗𝕦𝕤𝕔𝕒𝕥𝕠𝕣 𝕌𝕎𝕌  🎀  🍓", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -176,11 +200,6 @@ namespace VaporObfuscator
         private void Form1_Load(object sender, EventArgs e)
         {
             this.Location = Screen.AllScreens[0].WorkingArea.Location;
-        }
-
-        private void checkBox4_CheckedChanged(object sender, EventArgs e)
-        {
-            antitamper = !antitamper;
         }
 
         private void panel2_Paint(object sender, PaintEventArgs e)
@@ -218,9 +237,9 @@ namespace VaporObfuscator
             this.Opacity = ((double)trackBar1.Value /trackBar1.Maximum);
         }
 
-        private void checkBox5_CheckedChanged(object sender, EventArgs e)
+        private void checkBox4_CheckedChanged_1(object sender, EventArgs e)
         {
-            antidebug = !antidebug;
+            antide4dot = !antide4dot;
         }
     }
 }
