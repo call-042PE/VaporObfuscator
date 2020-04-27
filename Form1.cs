@@ -44,6 +44,7 @@ namespace VaporObfuscator
             foreach (TypeDef type in mod.Types)
             {
                 mod.Name = "ObfuscatedByVapor";
+                if (type.IsRuntimeSpecialName || type.IsGlobalModuleType) return;
                 type.Name = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
                 type.Namespace = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
                 foreach (PropertyDef property in type.Properties)
@@ -60,8 +61,7 @@ namespace VaporObfuscator
                 }
                 foreach(MethodDef method in type.Methods)
                 {
-                    if(!method.IsConstructor)
-                        method.Name = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
+                    method.Name = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
                 }
             }
         }
@@ -87,14 +87,15 @@ namespace VaporObfuscator
             }
         }
 
-        public void encryptString(ModuleDefMD module)
+        public void encryptString(ModuleDef module)
         {
             foreach (TypeDef type in module.Types)
             {
                 foreach(MethodDef method in type.Methods)
                 {
                 if (method.Body == null) continue;
-                    for(int i = 0; i < method.Body.Instructions.Count(); i++)
+                    method.Body.SimplifyBranches();
+                    for (int i = 0; i < method.Body.Instructions.Count; i++)
                     {
                         if(method.Body.Instructions[i].OpCode == OpCodes.Ldstr)
                         {
@@ -127,8 +128,6 @@ namespace VaporObfuscator
 
         private void button2_Click(object sender, EventArgs e)
         { 
-            try
-            {
                 ModuleDefMD module = ModuleDefMD.Load(textBox1.Text);
                 AssemblyDef assembly = AssemblyDef.Load(textBox1.Text);
                 if(nameprotection == true)
@@ -152,11 +151,6 @@ namespace VaporObfuscator
                     module.Write(textBox3.Text + ".exe");
                 }
                 MessageBox.Show("🍓  🎀  𝕌𝕎𝕌 𝕋𝕙𝕒𝕟𝕜𝕤 𝕗𝕠𝕣 𝕦𝕤𝕚𝕟𝕘 𝕍𝕒𝕡𝕠𝕣𝕆𝕓𝕗𝕦𝕤𝕔𝕒𝕥𝕠𝕣 𝕌𝕎𝕌  🎀  🍓", "🍓  🎀  𝕌𝕎𝕌 𝕋𝕙𝕒𝕟𝕜𝕤 𝕗𝕠𝕣 𝕦𝕤𝕚𝕟𝕘 𝕍𝕒𝕡𝕠𝕣𝕆𝕓𝕗𝕦𝕤𝕔𝕒𝕥𝕠𝕣 𝕌𝕎𝕌  🎀  🍓", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        catch (Exception)
-            {
-                MessageBox.Show("An error has occurred !", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
