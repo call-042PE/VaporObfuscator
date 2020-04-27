@@ -6,6 +6,8 @@
 
 The gui is inspired by the vaporwave visual and art mouvement.
 
+This obfuscator was made for learning and not for pwning grandma.
+
 # What features does it have?
 
 For the moment VaporObfuscator only 4 features
