@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29728.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaporObfuscator", "VaporObfuscator\VaporObfuscator.csproj", "{53D15B6C-38A8-496C-9AD6-B6BEA31EFCBB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{53D15B6C-38A8-496C-9AD6-B6BEA31EFCBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53D15B6C-38A8-496C-9AD6-B6BEA31EFCBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53D15B6C-38A8-496C-9AD6-B6BEA31EFCBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53D15B6C-38A8-496C-9AD6-B6BEA31EFCBB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {23FB25D6-1121-4FA8-950B-D8E79EE12D6D}
+	EndGlobalSection
+EndGlobal
