@@ -155,7 +155,7 @@ namespace VaporObfuscator
             }
         catch (Exception)
             {
-                MessageBox.Show("An error has occured !", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("An error has occurred !", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
