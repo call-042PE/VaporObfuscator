@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
-using dnlib.DotNet.Writer;
-using System.Security.Cryptography;
-using System.Runtime.InteropServices;
+using System.Collections;
 
 namespace VaporObfuscator
 {
@@ -31,6 +25,29 @@ namespace VaporObfuscator
             InitializeComponent();
         }
 
+        public static byte[] encodeBytes(byte[] bytes, string pass)
+        {
+            byte[] XorBytes = Encoding.Unicode.GetBytes(pass);
+
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes[i] ^= XorBytes[i % 16];
+            }
+
+            return bytes;
+        }
+        public static byte[] decryptBytes(byte[] bytes, String pass)
+        {
+            byte[] XorBytes = Encoding.Unicode.GetBytes(pass);
+
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes[i] ^= XorBytes[i % 16];
+            }
+
+            return bytes;
+        }
+
 
         private static Random random = new Random();
         public static string RandomString(int length)
@@ -46,24 +63,30 @@ namespace VaporObfuscator
             foreach (TypeDef type in mod.Types)
             {
                 mod.Name = "ObfuscatedByVapor";
-                if (type.IsGlobalModuleType) return;
-                type.Name = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
-                type.Namespace = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
-                foreach (PropertyDef property in type.Properties)
+                if (type.IsGlobalModuleType || type.IsRuntimeSpecialName || type.IsSpecialName || type.IsWindowsRuntime || type.IsInterface)
                 {
-                    property.Name = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
+                    continue;
                 }
-                foreach (FieldDef fields in type.Fields)
+                else
                 {
-                    fields.Name = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
-                }
-                foreach(EventDef eventdef in type.Events)
-                {
-                    eventdef.Name = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
-                }
-                foreach(MethodDef method in type.Methods)
-                {
-                    method.Name = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
+                    foreach (PropertyDef property in type.Properties)
+                    {
+                        if (property.IsRuntimeSpecialName) continue;
+                        property.Name = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
+                    }
+                    foreach (FieldDef fields in type.Fields)
+                    {
+                        fields.Name = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
+                    }
+                    foreach (EventDef eventdef in type.Events)
+                    {
+                        eventdef.Name = RandomString(20) + "俺ム仮 ｎｏ ｓｌｅｅｐ俺ム仮";
+                    }
+                    foreach (MethodDef method in type.Methods)
+                    {
+                        if (method.IsConstructor || method.IsRuntimeSpecialName || method.IsRuntime || method.IsStaticConstructor || method.IsVirtual) continue;
+                         method.Name = RandomString(20);
+                    }
                 }
             }
         }
@@ -101,14 +124,16 @@ namespace VaporObfuscator
                     {
                         if(method.Body.Instructions[i].OpCode == OpCodes.Ldstr)
                         {
-                            string oldstring = method.Body.Instructions[i].Operand.ToString();
-                            string newstring = Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(oldstring));
+                            string fakebase64encrypt = RandomString(100) + "==" + RandomString(10) + "/" + RandomString(20);
+                            string base64toencrypt = method.Body.Instructions[i].Operand.ToString();
+                            string base64EncryptedString = Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(base64toencrypt));
                             method.Body.Instructions[i].OpCode = OpCodes.Nop;
                             method.Body.Instructions.Insert(i + 1, new Instruction(OpCodes.Call, module.Import(typeof(System.Text.Encoding).GetMethod("get_UTF8", new Type[] { }))));
-                            method.Body.Instructions.Insert(i + 2, new Instruction(OpCodes.Ldstr, newstring));
+                            method.Body.Instructions.Insert(i + 2, new Instruction(OpCodes.Ldstr,base64EncryptedString));
                             method.Body.Instructions.Insert(i + 3, new Instruction(OpCodes.Call, module.Import(typeof(System.Convert).GetMethod("FromBase64String", new Type[] { typeof(string) }))));
                             method.Body.Instructions.Insert(i + 4, new Instruction(OpCodes.Callvirt, module.Import(typeof(System.Text.Encoding).GetMethod("GetString", new Type[] { typeof(byte[]) }))));
-                            i += 4;
+                            method.Body.Instructions.Add(OpCodes.Ret.ToInstruction());
+                            i += 5;
                         }
                     }
                 }
@@ -144,14 +169,15 @@ namespace VaporObfuscator
 
         private void button2_Click(object sender, EventArgs e)
         { 
-                ModuleDefMD module = ModuleDefMD.Load(textBox1.Text);
-                AssemblyDef assembly = AssemblyDef.Load(textBox1.Text);
-                if (antide4dot == true)
+            AssemblyDef assembly = AssemblyDef.Load(textBox1.Text);
+            ModuleContext modCtx = ModuleDefMD.CreateModuleContext();
+            ModuleDefMD module = ModuleDefMD.Load(textBox1.Text, modCtx);
+            if (antide4dot == true)
                 {
                     antiDe4Dot(module);
                     module.Write(textBox3.Text + ".exe");
                 }
-            if (nameprotection == true)
+                if (nameprotection == true)
                 {
                     ProtectName(assembly, module);
                     module.Write(textBox3.Text + ".exe");
