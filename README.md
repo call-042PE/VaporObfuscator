@@ -16,6 +16,7 @@ For the moment VaporObfuscator only 4 features
 * Fake Obfuscation Attribute
 * Junk Attribute
 * Encrypt Strings
+* Anti De4Dot
 
 # How do i test it?
 Simply start the app and click on go choose ur file and (っ◔◡◔)っ ♥ enjoy ♥
